@@ -1,0 +1,65 @@
+name: outline
+image:
+  repository: outlinewiki/outline
+  tag: 0.76.1
+  pullPolicy: IfNotPresent
+replicas: 1
+env:
+  SLACK_CLIENT_ID: ""
+  SLACK_CLIENT_SECRET: ""
+envSecrets:
+secretKey: "" # MUST be replaced! Generate a hex-encoded 32-byte random key. You should use `openssl rand -hex 32`
+utilsSecret: "" # Generate a unique random key. The format is not important but you could still use `openssl rand -hex 32`
+
+ingress:
+  host: outline.im.ntu.edu.tw
+  secret_name: outline-im-ntu-edu-tw-tls
+  annotations: # set your custom ingress annotations here
+    # cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  tls:
+    enabled: true
+
+redis:
+  enabled: true
+  architecture: "standalone"
+  persistence:
+    size: 2Gi
+    storageClass: ""
+  auth:
+    enabled: false
+
+postgresql:
+  enabled: true
+  architecture: "standalone"
+  postgresqlDatabase: "outline"
+  postgresqlUsername: ""
+  postgresqlPassword: "" # MUST be replaced with some secret password! Don't use this in production
+  postgresqlPostgresPassword: "" # MUST be replaced with some secret password! Don't use this in production
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 1Gi
+
+minio:
+  enabled: true
+  disableWebUI: false
+  ingress:
+    enabled: true
+    hostname: minio.im.ntu.edu.tw
+    certManager: false
+    tls: 
+    - secretName: minio-im-ntu-edu-tw-tls
+      hosts:
+        - minio.im.ntu.edu.tw
+  mode: "standalone"
+  defaultBuckets: "ol-data" # should not be "outline" because of https://github.com/outline/outline/issues/2068
+  secretKey:
+    password: "" # MUST be replaced with some custom generated secret! Don't use this in production
+  accessKey:
+    password: "" # MUST be replaced with some custom generated access_key! Don't use this in production
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 2Gi
+
+
